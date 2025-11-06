@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deputy Dashboard - Teacher Documents</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📁 Teacher Documents - Deputy Dashboard</h2>
+        <a href="{{ url_for('deputy_dashboard') }}" class="btn btn-secondary btn-sm">⬅ Back to Dashboard</a>
+    </div>
+
+    <!-- Current Date & Time -->
+    <div class="mb-3 text-center">
+        <h5>🕒 Current Date & Time: <span id="currentTime"></span></h5>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Filter by Submit Date -->
+    <form method="POST" class="row mb-3">
+        <div class="col-md-3">
+            <input type="date" name="filter_date" class="form-control" value="{{ filter_date or '' }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a href="{{ url_for('deputy_documents') }}" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
+    <!-- Documents Table -->
+    <div id="documentsTableContainer">
+        <table class="table table-bordered table-striped shadow-sm">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th>#</th>
+                    <th>Teacher ID</th>
+                    <th>Document Type</th>
+                    <th>File</th>
+                    <th>Submit Date</th>
+                    <th>Submit Time</th>
+                    <th>Status</th>
+                    <th>Upload Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for doc in documents %}
+                <tr class="document-row" data-upload="{{ doc[7] }}"> <!-- UploadDate -->
+                    <td>{{ doc[0] }}</td> <!-- DocumentID -->
+                    <td>{{ doc[1] }}</td> <!-- TeacherID -->
+                    <td>{{ doc[2] }}</td> <!-- DocumentType -->
+                    <td class="text-center">
+                        {% if doc[3] %}
+                            <a href="{{ url_for('download_file', filename=doc[3]) }}" class="btn btn-info btn-sm">Download</a>
+                        {% else %}
+                            — 
+                        {% endif %}
+                    </td>
+                    <td>{{ doc[4] }}</td> <!-- SubmitDate -->
+                    <td>{{ doc[5] }}</td> <!-- SubmitTime -->
+                    <td>
+                        {% if doc[6] == 'Approved' %}
+                            <span class="badge bg-success">{{ doc[6] }}</span>
+                        {% elif doc[6] == 'Denied' %}
+                            <span class="badge bg-danger">{{ doc[6] }}</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ doc[6] }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ doc[7] or '—' }}</td> <!-- UploadDate -->
+                    <td class="text-center">
+                        {% if doc[6] == 'Pending' %}
+                            <a href="{{ url_for('deputy_approve_doc', document_id=doc[0]) }}" class="btn btn-success btn-sm">Approve</a>
+                            <a href="{{ url_for('deputy_deny_doc', document_id=doc[0]) }}" class="btn btn-danger btn-sm">Deny</a>
+                        {% else %}
+                            <button class="btn btn-secondary btn-sm" disabled>Processed</button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ----- Live Current Time -----
+function updateCurrentTime() {
+    const now = new Date();
+    const options = { 
+        weekday: 'short', year: 'numeric', month: 'short', day: 'numeric',
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    };
+    document.getElementById('currentTime').textContent = now.toLocaleDateString('en-US', options);
+}
+
+// ----- Countdown for UploadDate -----
+function updateCountdownsAndRows() {
+    const countdownElements = document.querySelectorAll('.document-row');
+    const now = new Date();
+
+    countdownElements.forEach((row) => {
+        const uploadDateStr = row.getAttribute('data-upload');
+        if (!uploadDateStr) return;
+
+        const targetDate = new Date(uploadDateStr + 'T23:59:59');
+        const diff = targetDate - now;
+
+        if (diff <= 0) row.style.backgroundColor = "#f8d7da"; // expired
+        else if (diff <= 24*60*60*1000) row.style.backgroundColor = "#fff3cd"; // less than 1 day
+        else row.style.backgroundColor = "#d4edda"; // green
+    });
+}
+
+setInterval(() => {
+    updateCurrentTime();
+    updateCountdownsAndRows();
+}, 1000);
+
+updateCurrentTime();
+updateCountdownsAndRows();
+</script>
+
+</body>
+</html>

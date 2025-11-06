@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+ <div class="d-flex justify-content-between align-items-center mb-3">
+            
+            
+        </div>
+    <!-- Page Title -->
+    <div class="text-center mb-4">
+        <h2 class="text-primary fw-bold">📊 SMART Classroom Usage Reports</h2>
+        <p class="text-muted small">
+            Report generated on: <strong>{{ now.strftime('%Y-%m-%d %I:%M %p') }}</strong>
+        </p>
+    </div>
+    <hr>
+
+    <!-- 📈 Analytics Charts -->
+    <div class="row g-4 mb-4">
+        <!-- Booking Status Chart -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 h-100 p-3">
+                <h5 class="card-title text-center">Booking Status</h5>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Top Teachers Chart -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 h-100 p-3">
+                <h5 class="card-title text-center">Top  Teachers</h5>
+                <canvas id="teacherChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Top Subjects Chart -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 h-100 p-3">
+                <h5 class="card-title text-center">Top  Subjects</h5>
+                <canvas id="subjectChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Booking Status Summary -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-secondary text-white fw-bold">Booking Status Summary</div>
+                <div class="card-body">
+                    {% if summary %}
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Approved
+                            <span class="badge bg-success rounded-pill">{{ summary.get('Approved', 0) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Pending
+                            <span class="badge bg-warning text-dark rounded-pill">{{ summary.get('Pending', 0) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Denied
+                            <span class="badge bg-danger rounded-pill">{{ summary.get('Denied', 0) }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Cancelled
+                            <span class="badge bg-info rounded-pill">{{ summary.get('Cancelled', 0) }}</span>
+                        </li>
+                    </ul>
+                    {% else %}
+                    <p class="text-muted text-center">No booking data available.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Teachers Table -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-primary text-white fw-bold">Top  Teachers</div>
+                <div class="card-body">
+                    {% if teacher_ranking %}
+                    <table class="table table-sm table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Teacher</th>
+                                <th class="text-end">Bookings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for teacher in teacher_ranking[:5] %}
+                            <tr>
+                                <td>{{ teacher[0] }}</td>
+                                <td class="text-end"><span class="badge bg-primary">{{ teacher[1] }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center">No teacher ranking data found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Subjects Table -->
+        <div class="col-md-4">
+            <div class="card shadow-lg border-0 h-100">
+                <div class="card-header bg-info text-white fw-bold">Top  Subjects</div>
+                <div class="card-body">
+                    {% if subject_ranking %}
+                    <table class="table table-sm table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Subject</th>
+                                <th class="text-end">Bookings</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for subject in subject_ranking[:5] %}
+                            <tr>
+                                <td>{{ subject[0] }}</td>
+                                <td class="text-end"><span class="badge bg-info">{{ subject[1] }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center">No subject ranking data found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Teacher List -->
+    <div class="mt-5">
+       
+        {% if teacher_list %}
+        <div class="table-responsive shadow-sm">
+            <table class="table table-hover table-bordered align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Total Bookings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for teacher in teacher_list %}
+                    <tr>
+                        <td>{{ teacher.FullName if teacher.FullName is defined else teacher.Name if teacher.Name is defined else teacher[0] }}</td>
+                        <td>{{ teacher.Email if teacher.Email is defined else teacher[1] }}</td>
+                        <td>{{ teacher.Phone if teacher.Phone is defined else teacher[2] }}</td>
+                        <td><span class="badge bg-success">{{ teacher.Bookings if teacher.Bookings is defined else teacher[3] }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted text-center">No teacher registration records found.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // --- Booking Status Chart ---
+    const statusData = {
+        labels: Object.keys({{ summary | tojson }}),
+        datasets: [{
+            label: 'Bookings',
+            data: Object.values({{ summary | tojson }}),
+            backgroundColor: ['#198754', '#ffc107', '#dc3545', '#0dcaf0'],
+            hoverOffset: 6
+        }]
+    };
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: statusData,
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    // --- Top Teachers Chart ---
+    const teacherLabels = [];
+    const teacherCounts = [];
+    {% for name, count in teacher_ranking[:5] %}
+        teacherLabels.push("{{ name }}");
+        teacherCounts.push({{ count }});
+    {% endfor %}
+    new Chart(document.getElementById('teacherChart'), {
+        type: 'bar',
+        data: {
+            labels: teacherLabels,
+            datasets: [{
+                label: 'Approved Bookings',
+                data: teacherCounts,
+                backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+
+    // --- Top Subjects Chart ---
+    const subjectLabels = [];
+    const subjectCounts = [];
+    {% for subject, count in subject_ranking[:5] %}
+        subjectLabels.push("{{ subject }}");
+        subjectCounts.push({{ count }});
+    {% endfor %}
+    new Chart(document.getElementById('subjectChart'), {
+        type: 'bar',
+        data: {
+            labels: subjectLabels,
+            datasets: [{
+                label: 'Approved Bookings',
+                data: subjectCounts,
+                backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                borderColor: 'rgb(75, 192, 192)',
+                borderWidth: 1
+            }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+</script>
+{% endblock %}
