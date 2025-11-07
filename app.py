@@ -41,7 +41,7 @@ from flask import Flask
 from itsdangerous import URLSafeTimedSerializer
 # --- Flask App Setup ---
 app = Flask(__name__)
-
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_fallback_key')
 app.config['SECRET_KEY'] = '9f2d3a7b6e4c1f5a0d7b8c1e3f9a4b2c8e7d1a3b4c5f6d7e8a9b0c1d2e3f4a5b'
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 # Flask-Mail settings (example with Gmail)
