@@ -20,7 +20,8 @@ from smart_scheduler import submit_teacher_document
 from smart_scheduler import get_all_classrooms, get_all_teachers, get_all_bookings
 from math import ceil
 # Note: Removed unused imports: datetime, timedelta, Counter, defaultdict, etc.
-
+import secrets
+secrets.token_hex(32)
 from werkzeug.security import generate_password_hash
 # Import DB and Core Logic
 # Assuming db_setup.py and smart_scheduler.py are in place and correct
