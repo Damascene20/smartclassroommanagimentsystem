@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import sqlite3
 from werkzeug.utils import secure_filename
 import sqlite3
-from flask_mail import Message
+
 from itsdangerous import URLSafeTimedSerializer
 
 from flask import make_response
@@ -16,6 +16,7 @@ from datetime import datetime # <-- Import the datetime object
 from collections import defaultdict
 from collections import Counter
 import os
+from flask_mail import Mail, Message
 from smart_scheduler import submit_teacher_document
 from smart_scheduler import get_all_classrooms, get_all_teachers, get_all_bookings
 from math import ceil
@@ -45,13 +46,13 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_fallback_key')
 app.config['SECRET_KEY'] = '9f2d3a7b6e4c1f5a0d7b8c1e3f9a4b2c8e7d1a3b4c5f6d7e8a9b0c1d2e3f4a5b'
 serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 # Flask-Mail settings (example with Gmail)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_fallback_key')
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-from flask_mail import Mail
+app.config['MAIL_USERNAME'] = 'nshimiryayodamas@gmail.com'
+app.config['MAIL_PASSWORD'] = 'fnlo ttfa qhww gdlw'
+MAIL_DEFAULT_SENDER='nshimiryayodamas@gmail.com'
+
 mail = Mail(app)
 # *** IMPORTANT: Change this to a secure, long random string for production ***
 app.secret_key = 'your_super_secure_secret_key_12345' 
