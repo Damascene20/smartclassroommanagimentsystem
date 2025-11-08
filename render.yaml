@@ -4,10 +4,19 @@ services:
     env: python
     region: frankfurt  # or oregon, singapore, etc.
     plan: free
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      # Run database migrations if using Flask-Migrate
+      flask db upgrade
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
         generateValue: true
+      - key: DATABASE_URL
+        value: mysql+pymysql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
+      # Optional PostgreSQL example:
+      # - key: DATABASE_URL
+      #   value: postgresql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
