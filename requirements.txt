@@ -1,3 +1,4 @@
+cat > requirements.txt << 'EOF'
 africastalking==1.2.9
 aiosqlite==0.20.0
 alembic==1.12.1
@@ -90,3 +91,4 @@ Werkzeug==3.0.1
 WTForms==3.1.1
 xhtml2pdf==0.2.11
 zipp==3.17.0
+EOF
