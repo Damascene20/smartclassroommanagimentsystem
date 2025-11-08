@@ -2,17 +2,15 @@ services:
   - type: web
     name: smartclassroommanagamentsystem
     env: python
+    pythonVersion: 3.12.4   # ✅ Explicitly set compatible Python
     region: frankfurt
     plan: free
     buildCommand: |
       pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
-      flask db upgrade   # Runs migrations automatically
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
         generateValue: true
-      - key: DATABASE_URL
-        value: mysql+pymysql://<DB_USER>:<DB_PASSWORD>@<DB_HOST>:<DB_PORT>/<DB_NAME>
