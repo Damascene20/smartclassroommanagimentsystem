@@ -5,10 +5,12 @@ services:
     region: frankfurt
     plan: free
     buildCommand: |
-      pip install --upgrade pip
+      pip install --upgrade pip setuptools wheel
       pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.0
       - key: FLASK_ENV
         value: production
       - key: SECRET_KEY
