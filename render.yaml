@@ -2,13 +2,12 @@ services:
   - type: web
     name: smartclassroommanagamentsystem
     env: python
-    pythonVersion: 3.12.4   # ✅ Explicitly set compatible Python
     region: frankfurt
     plan: free
     buildCommand: |
-      pip install --upgrade pip setuptools wheel
+      pip install --upgrade pip
       pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app:app
     envVars:
       - key: FLASK_ENV
         value: production
